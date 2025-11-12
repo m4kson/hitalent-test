@@ -1,0 +1,17 @@
+type: object
+properties:
+  user_id:
+    type: string
+    format: uuid
+    description: UUID пользователя, оставляющего ответ
+  text:
+    type: string
+    minLength: 5
+    maxLength: 1000
+    description: Текст ответа (минимум 5 символов, максимум 1000)
+required:
+  - user_id
+  - text
+example:
+  user_id: "550e8400-e29b-41d4-a716-446655440000"
+  text: "Paris is the capital of France"

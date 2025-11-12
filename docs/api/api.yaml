@@ -1,0 +1,212 @@
+openapi: 3.0.3
+info:
+  title: Q&A Service API
+  description: API сервис для вопросов и ответов
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+paths:
+  /questions/:
+    get:
+      summary: Получить список всех вопросов
+      operationId: listQuestions
+      tags:
+        - Questions
+      responses:
+        '200':
+          description: Список вопросов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: './models/question.yaml'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    
+    post:
+      summary: Создать новый вопрос
+      operationId: createQuestion
+      tags:
+        - Questions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './models/create-question-request.yaml'
+      responses:
+        '201':
+          description: Вопрос создан
+          content:
+            application/json:
+              schema:
+                $ref: './models/question.yaml'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /questions/{id}:
+    get:
+      summary: Получить вопрос и все ответы на него
+      operationId: getQuestion
+      tags:
+        - Questions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: uint
+      responses:
+        '200':
+          description: Вопрос с ответами
+          content:
+            application/json:
+              schema:
+                $ref: './models/question-with-answers.yaml'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    
+    delete:
+      summary: Удалить вопрос (вместе с ответами)
+      operationId: deleteQuestion
+      tags:
+        - Questions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: uint
+      responses:
+        '204':
+          description: Вопрос удалён
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /questions/{id}/answers/:
+    post:
+      summary: Добавить ответ к вопросу
+      operationId: createAnswer
+      tags:
+        - Answers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: uint
+          description: ID вопроса
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './models/create-answer-request.yaml'
+      responses:
+        '201':
+          description: Ответ создан
+          content:
+            application/json:
+              schema:
+                $ref: './models/answer.yaml'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /answers/{id}:
+    get:
+      summary: Получить конкретный ответ
+      operationId: getAnswer
+      tags:
+        - Answers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: uint
+      responses:
+        '200':
+          description: Ответ найден
+          content:
+            application/json:
+              schema:
+                $ref: './models/answer.yaml'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    
+    delete:
+      summary: Удалить ответ
+      operationId: deleteAnswer
+      tags:
+        - Answers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: uint
+      responses:
+        '204':
+          description: Ответ удалён
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /health:
+    get:
+      summary: Health check
+      operationId: healthCheck
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: OK
+
+components:
+  responses:
+    BadRequest:
+      description: Некорректные входные данные
+      content:
+        application/json:
+          schema:
+            $ref: './models/error-response.yaml'
+    
+    NotFound:
+      description: Ресурс не найден
+      content:
+        application/json:
+          schema:
+            $ref: './models/error-response.yaml'
+    
+    InternalServerError:
+      description: Внутренняя ошибка сервера
+      content:
+        application/json:
+          schema:
+            $ref: './models/error-response.yaml'

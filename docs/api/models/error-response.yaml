@@ -1,0 +1,13 @@
+type: object
+properties:
+  error:
+    type: string
+    description: HTTP статус текст (например, "Bad Request", "Not Found")
+  message:
+    type: string
+    description: Подробное описание ошибки
+required:
+  - error
+example:
+  error: "Bad Request"
+  message: "invalid input data: question text is required"
