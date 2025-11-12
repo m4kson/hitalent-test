@@ -1,0 +1,11 @@
+type: object
+properties:
+  text:
+    type: string
+    minLength: 10
+    maxLength: 1000
+    description: Текст вопроса (минимум 10 символов, максимум 1000)
+required:
+  - text
+example:
+  text: "What is the capital of France?"
