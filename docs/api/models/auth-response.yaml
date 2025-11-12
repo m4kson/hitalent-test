@@ -1,0 +1,21 @@
+type: object
+properties:
+  access_token:
+    type: string
+    description: JWT access token (действителен 15 минут)
+  refresh_token:
+    type: string
+    description: JWT refresh token (действителен 7 дней)
+  user:
+    $ref: './user.yaml'
+required:
+  - access_token
+  - refresh_token
+  - user
+example:
+  access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  refresh_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  user:
+    id: "550e8400-e29b-41d4-a716-446655440000"
+    email: "user@example.com"
+    created_at: "2025-01-15T10:30:45Z"
