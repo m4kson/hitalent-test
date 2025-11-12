@@ -8,6 +8,93 @@ servers:
     description: Local development server
 
 paths:
+  /auth/register:
+    post:
+      summary: Регистрация нового пользователя
+      operationId: registerUser
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './models/register-request.yaml'
+      responses:
+        '201':
+          description: Пользователь успешно зарегистрирован
+          content:
+            application/json:
+              schema:
+                $ref: './models/user.yaml'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /auth/login:
+    post:
+      summary: Логин пользователя
+      operationId: loginUser
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './models/login-request.yaml'
+      responses:
+        '200':
+          description: Успешная авторизация
+          content:
+            application/json:
+              schema:
+                $ref: './models/auth-response.yaml'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          description: Неверные credentials
+          content:
+            application/json:
+              schema:
+                $ref: './models/error-response.yaml'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /auth/refresh:
+    post:
+      summary: Обновить access token
+      operationId: refreshToken
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './models/refresh-request.yaml'
+      responses:
+        '200':
+          description: Новый access token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          description: Истёкший или невалидный refresh token
+          content:
+            application/json:
+              schema:
+                $ref: './models/error-response.yaml'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   /questions/:
     get:
       summary: Получить список всех вопросов
@@ -96,10 +183,12 @@ paths:
 
   /questions/{id}/answers/:
     post:
-      summary: Добавить ответ к вопросу
+      summary: Добавить ответ к вопросу (требует авторизацию)
       operationId: createAnswer
       tags:
         - Answers
+      security:
+        - BearerAuth: []
       parameters:
         - name: id
           in: path
@@ -107,13 +196,18 @@ paths:
           schema:
             type: integer
             format: uint
-          description: ID вопроса
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: './models/create-answer-request.yaml'
+              type: object
+              properties:
+                text:
+                  type: string
+                  description: Текст ответа (user_id заполняется автоматически)
+              required:
+                - text
       responses:
         '201':
           description: Ответ создан
@@ -123,6 +217,12 @@ paths:
                 $ref: './models/answer.yaml'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          description: Требуется авторизация
+          content:
+            application/json:
+              schema:
+                $ref: './models/error-response.yaml'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -189,6 +289,13 @@ paths:
                 example: OK
 
 components:
+  securitySchemes:
+      BearerAuth:
+        type: http
+        scheme: bearer
+        bearerFormat: JWT
+        description: Используйте access token из /auth/login
+
   responses:
     BadRequest:
       description: Некорректные входные данные

@@ -1,0 +1,9 @@
+type: object
+properties:
+  refresh_token:
+    type: string
+    description: Refresh token полученный при логине
+required:
+  - refresh_token
+example:
+  refresh_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
