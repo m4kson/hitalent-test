@@ -9,17 +9,13 @@ import (
 )
 
 func NewRouter(
-	questionService *service.QuestionService,
-	answerService *service.AnswerService,
-	authService *service.AuthService,
+	questionHandler *handler.QuestionHandler,
+	answerHandler *handler.AnswerHandler,
+	authHandler *handler.AuthHandler,
 	tokenService *service.TokenService,
 	logger *slog.Logger,
 ) http.Handler {
 	mux := http.NewServeMux()
-
-	questionHandler := handler.NewQuestionHandler(questionService, logger)
-	answerHandler := handler.NewAnswerHandler(answerService, logger)
-	authHandler := handler.NewAuthHandler(authService, logger)
 
 	authMiddleware := middleware.Auth(tokenService, logger)
 
