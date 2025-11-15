@@ -23,6 +23,7 @@ func NewAnswerHandler(service *service.AnswerService, logger *slog.Logger) *Answ
 
 func (h *AnswerHandler) Create(w http.ResponseWriter, r *http.Request) {
 	requestID := r.Context().Value("request_id").(string)
+	userID := r.Context().Value("user_id").(string)
 
 	idStr := r.PathValue("id")
 	questionID, err := strconv.ParseUint(idStr, 10, 32)
@@ -36,6 +37,8 @@ func (h *AnswerHandler) Create(w http.ResponseWriter, r *http.Request) {
 		HandleError(w, h.logger, domain.ErrInvalidInput, requestID)
 		return
 	}
+
+	req.UserID = userID
 
 	answer, err := h.service.Create(uint(questionID), &req)
 	if err != nil {
