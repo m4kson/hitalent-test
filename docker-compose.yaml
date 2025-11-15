@@ -5,15 +5,15 @@ services:
     image: postgres:16-alpine
     container_name: qa_postgres
     environment:
-      POSTGRES_USER: qauser
-      POSTGRES_PASSWORD: qapassword
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: qaservice
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U qauser -d qaservice"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d qaservice"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -42,7 +42,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    command: sh -c "goose -dir /migrations postgres 'host=postgres port=5432 user=qauser password=qapassword dbname=qaservice sslmode=disable' up && /bin/app"
+    command: sh -c "goose -dir /migrations postgres 'host=postgres port=5432 user=postgres password=postgres dbname=qaservice sslmode=disable' up && /bin/app"
 
 volumes:
   postgres_data:
