@@ -24,3 +24,4 @@ DROP INDEX IF EXISTS idx_answers_created_at;
 DROP INDEX IF EXISTS idx_answers_user_id;
 DROP INDEX IF EXISTS idx_answers_question_id;
 DROP TABLE IF EXISTS answers;
+
