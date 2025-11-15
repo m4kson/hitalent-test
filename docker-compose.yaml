@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: qa_postgres
+    environment:
+      POSTGRES_USER: qauser
+      POSTGRES_PASSWORD: qapassword
+      POSTGRES_DB: qaservice
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U qauser -d qaservice"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: qa_app
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: 8080
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: qaservice
+      DB_SSLMODE: disable
+      LOG_LEVEL: info
+      LOG_FORMAT: json
+      JWT_SECRET: your-super-secret-key-change-in-production-12345
+      JWT_ACCESS_TOKEN_EXPIRY: 15m
+      JWT_REFRESH_TOKEN_EXPIRY: 168h
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: sh -c "goose -dir /migrations postgres 'host=postgres port=5432 user=qauser password=qapassword dbname=qaservice sslmode=disable' up && /bin/app"
+
+volumes:
+  postgres_data:
