@@ -55,14 +55,8 @@ git clone https://github.com/m4kson/hitalent-test.git
 cd hitalent-test
 ```
 
-#### 2. Создание конфигурации
 
-```bash
-cp .env .env
-
-```
-
-#### 3. Запуск приложения
+#### 2. Запуск приложения
 
 ```bash
 docker-compose up --build
